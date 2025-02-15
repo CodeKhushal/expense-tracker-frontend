@@ -66,7 +66,7 @@ const UpdateExpense = ({ expense }) => {
     console.log(formData);
     try {
       setLoading(true);
-      const res = await axios.post(
+      const res = await axios.put(
         `${EXPENSE_API_END_POINT}/add`,
         // const res = await axios.put(
         //   `http://localhost:8000/api/v1/expense/update/${expense._id}`,
