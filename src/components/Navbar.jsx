@@ -1,4 +1,4 @@
-import React, { use } from "react";
+import React from "react";
 import Logo from "./shared/Logo";
 import { Popover, PopoverContent, PopoverTrigger} from "./ui/popover";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { USER_API_END_POINT } from '@/utils/endpoints'
+import localStorage from "redux-persist/es/storage";
 
 const Navbar = () => {
   const {user} = useSelector(store => store.auth);
@@ -17,7 +18,7 @@ const Navbar = () => {
       // const res = await axios.get("http://localhost:8000/api/v1/user/logout");
       const res = await axios.get(`${USER_API_END_POINT}/logout`);
       if(res.data.success) {
-        // localStorage.removeItem("token");
+        localStorage.removeItem("authToken");
         navigate("/login");
         toast.success(res.data.message);
       }

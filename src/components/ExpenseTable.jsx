@@ -51,7 +51,7 @@ const ExpenseTable = () => {
     try {
       const res = await axios.put(
         // `http://localhost:8000/api/v1/expense/${expenseId}/done`,
-        `${EXPENSE_API_END_POINT}/done`,
+        `${EXPENSE_API_END_POINT}/${expenseId}/done`,
         { done: newStatus },
         {
           headers: {
