@@ -1,7 +1,7 @@
 import { setExpenses } from "@/redux/expenseSlice"
 import { EXPENSE_API_END_POINT } from "@/utils/endpoints"
 import axios from "axios"
-// import { useEffect } from "react"
+import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 const useGetExpenses = () => {
