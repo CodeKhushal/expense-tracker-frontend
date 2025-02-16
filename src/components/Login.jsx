@@ -40,10 +40,6 @@ const Login = () => {
         }
       );
       if (res.data.success) {
-        const token = res.data.token; // Assuming token is in response
-        if (token) {
-          localStorage.setItem("authToken", token); // Store in localStorage
-        }
         dispatch(setAuthUser(res.data.user));
         navigate("/");
         toast.success(res.data.message);
