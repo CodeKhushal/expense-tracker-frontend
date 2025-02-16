@@ -78,10 +78,8 @@ const ExpenseTable = () => {
     }
   };
 
-  const totalAmount = localExpense.reduce((sum, expense) => {
-    if (!checkedItems[expense._id]) {
-      return sum + expense.amount;
-    }
+  const totalAmount = expenses.reduce((sum, expense) => {
+    if (!expense.done) return sum + expense.amount;
     return sum;
   }, 0);
 

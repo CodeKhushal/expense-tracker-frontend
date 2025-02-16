@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCategory, setMarkAsDone } from "@/redux/expenseSlice";
 import ExpenseTable from "./ExpenseTable";
 import useGetExpenses from "@/hooks/useGetExpense";
@@ -17,6 +17,8 @@ import useGetExpenses from "@/hooks/useGetExpense";
 const Home = () => {
   useGetExpenses();
   const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.auth);
+
   const changeCategoryHandler = (value) => {
     dispatch(setCategory(value));
   };
@@ -28,7 +30,9 @@ const Home = () => {
       <Navbar />
       <div className="max-w-6xl mx-auto mt-6">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-bold text-lg">Expense Tracker</h2>
+        <h2 className="font-bold text-lg">
+            {user ? `Welcome, ${user.fullname}` : "Expense Tracker"}
+          </h2>
           <CreateExpense />
         </div>
         <div className="flex items-center gap-4 mb-4">
