@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -16,15 +16,36 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const [timeoutReached, setTimeoutReached] = useState(false);
   const { loading } = useSelector((store) => store.auth);
+  const controllerRef = React.useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (loading) {
+      controllerRef.current = new AbortController();
+      const timeoutId = setTimeout(() => {
+        if (loading) {
+          setTimeoutReached(true);
+          controllerRef.current.abort();
+        }
+      }, 20000);
+
+      return () => {
+        clearTimeout(timeoutId);
+        controllerRef.current.abort();
+      };
+    }
+  }, [loading]);
+
   // api integration
   const submitHandler = async (e) => {
     e.preventDefault();
+    setTimeoutReached(false);
     try {
       dispatch(setLoading(true));
       const res = await axios.post(
@@ -36,6 +57,7 @@ const Login = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          signal: controllerRef.current?.signal,
           withCredentials: true,
         }
       );
@@ -45,6 +67,11 @@ const Login = () => {
         toast.success(res.data.message);
       }
     } catch (error) {
+      if (error.name === "AbortError") {
+        toast.error(
+          "Connection timeout. Please check your internet connection"
+        );
+      }
       console.log(error);
       toast.error(error.response.data.message);
     } finally {
@@ -90,6 +117,27 @@ const Login = () => {
             Signup
           </Link>
         </p>
+        {timeoutReached && (
+          <div className="mt-4 p-3 bg-yellow-100 rounded-lg text-sm">
+            <p>😟 Connection taking longer than expected...</p>
+            <p className="mt-2">
+              Try:
+              <br />
+              1. Checking your internet connection
+              <br />
+              2. Whitelisting our domain in firewall
+              <br />
+              3.{" "}
+              <button
+                type="button"
+                className="text-blue-600 underline"
+                onClick={submitHandler}
+              >
+                Retry now
+              </button>
+            </p>
+          </div>
+        )}
       </form>
     </div>
   );

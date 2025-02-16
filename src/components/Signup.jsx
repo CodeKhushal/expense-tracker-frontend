@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -17,15 +17,36 @@ const Signup = () => {
     email: "",
     password: "",
   });
+  const [timeoutReached, setTimeoutReached] = useState(false);
   const { loading } = useSelector((store) => store.auth);
+  const controllerRef = React.useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (loading) {
+      controllerRef.current = new AbortController();
+      const timeoutId = setTimeout(() => {
+        if (loading) {
+          setTimeoutReached(true);
+          controllerRef.current.abort();
+        }
+      }, 20000);
+
+      return () => {
+        clearTimeout(timeoutId);
+        controllerRef.current.abort();
+      };
+    }
+  }, [loading]);
+
   // api integration
   const submitHandler = async (e) => {
     e.preventDefault();
+    setTimeoutReached(false);
     try {
       dispatch(setLoading(true));
       const res = await axios.post(`${USER_API_END_POINT}/register`, input, {
@@ -33,6 +54,7 @@ const Signup = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        signal: controllerRef.current?.signal,
         withCredentials: true,
       });
       console.log(res);
@@ -41,6 +63,9 @@ const Signup = () => {
         toast.success(res.data.message);
       }
     } catch (error) {
+      if (error.name === "AbortError") {
+        toast.error("Server response timeout. Please try again later");
+      }
       console.log(error);
       toast.error(error.response.data.message);
     } finally {
@@ -97,6 +122,23 @@ const Signup = () => {
             Login
           </Link>
         </p>
+        {timeoutReached && (
+          <div className="mt-4 p-3 bg-yellow-100 rounded-lg text-sm">
+            <p>⚠️ Server is taking too long to respond</p>
+            <p className="mt-2">
+              Possible solutions:
+              <br />
+              1. Try again in a few minutes
+              <br />
+              2. Check our{" "}
+              <a href="/status" className="text-blue-600">
+                status page
+              </a>
+              <br />
+              3. Contact support@kexptracker.com
+            </p>
+          </div>
+        )}
       </form>
     </div>
   );
