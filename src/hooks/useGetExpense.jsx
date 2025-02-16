@@ -1,9 +1,8 @@
 import { setExpenses } from "@/redux/expenseSlice"
 import { EXPENSE_API_END_POINT } from "@/utils/endpoints"
 import axios from "axios"
-import { useEffect } from "react"
+// import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import localStorage from "redux-persist/es/storage"
 
 const useGetExpenses = () => {
     const dispatch = useDispatch();
@@ -12,8 +11,6 @@ const useGetExpenses = () => {
     useEffect(() => {
         const fetchExpenses = async () => {
             try {
-                const token = localStorage.getItem("token"); // Check if token exists
-                if (!token) throw new Error("No authentication token found");
                 axios.defaults.withCredentials = true;
                 const res = await axios.get(`${EXPENSE_API_END_POINT}/getall?category=${category}&done=${markAsDone}`,
                     {
