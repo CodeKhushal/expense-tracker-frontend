@@ -78,7 +78,7 @@ const ExpenseTable = () => {
     }
   };
 
-  const totalAmount = expenses.reduce((sum, expense) => {
+  const totalAmount = localExpense.reduce((sum, expense) => {
     if (!expense.done) return sum + expense.amount;
     return sum;
   }, 0);
